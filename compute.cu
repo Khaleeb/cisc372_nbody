@@ -41,7 +41,7 @@ __global__ void pSum(vector3 *accels, vector3 *accel_sum, vector3 *hPos, vector3
 		FILL_VECTOR(accel_sum[i], 0, 0, 0);
 		for (int j = 0; j < NUMENTITIES; j++){
 			for (int k = 0;k < 3; k++) {
-				accel_sum[i][k] += accels[i * NUMENTITIES+ j][k];
+				accel_sum[i][k] += accels[(i * NUMENTITIES) + j][k];
 			}
 		}
 		// updated vel and pos
