@@ -10,7 +10,7 @@ compute.o: compute.c config.h vector.h $(ALWAYS_REBUILD)
 	gcc $(FLAGS) -c $<
 
 pNbody: nbody.cu compute.cu
-	nvcc nbody.cu compute.cu -o pNbody
+	nvcc $(FLAGS) nbody.cu compute.cu -o pNbody $(LIBS)
 
 
 clean:
