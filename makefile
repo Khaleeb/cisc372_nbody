@@ -14,4 +14,4 @@ pNbody: nbody.cu compute.cu
 
 
 clean:
-	rm -f *.o nbody
+	rm -f *.o nbody pNbody *.err *.out
