@@ -5,8 +5,13 @@ ALWAYS_REBUILD=makefile
 nbody: nbody.o compute.o
 	gcc $(FLAGS) $^ -o $@ $(LIBS)
 nbody.o: nbody.c planets.h config.h vector.h $(ALWAYS_REBUILD)
-	gcc $(FLAGS) -c $< 
+	gcc $(FLAGS) -c $<
 compute.o: compute.c config.h vector.h $(ALWAYS_REBUILD)
-	gcc $(FLAGS) -c $< 
+	gcc $(FLAGS) -c $<
+
+pNbody: nbody.cu compute.cu
+	nvcc nbody.cu compute.cu -o pNbody
+
+
 clean:
-	rm -f *.o nbody 
+	rm -f *.o nbody
