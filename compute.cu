@@ -35,13 +35,13 @@ __global__ void pComputation(vector3 *hPos, vector3 *accels, double *mass){
 
 // Parallel matrix sum and update
 __global__ void pSum(vector3 *accels, vector3 *accel_sum, vector3 *hPos, vector3 *hVel){
-	int row = blockIdx.x * blockDimx + threadIdx.x;
+	int row = blockIdx.x * blockDim.x + threadIdx.x;
 	int i = row;
 	if (i < NUMENTITIES){
 		FILL_VECTOR(accel_sum[i], 0, 0, 0);
-		for (int j = 0; j < numEntities; j++){
+		for (int j = 0; j < NUMENTITIES; j++){
 			for (int k = 0;k < 3; k++) {
-				accel_sum[i][k] += accels[i * numEntities + j][k];
+				accel_sum[i][k] += accels[i * NUMENTITIES+ j][k];
 			}
 		}
 		// updated vel and pos
@@ -64,7 +64,7 @@ void compute(){
 
 	// create matrixes for calculation and division of work
 	int blocksD = ceilf( NUMENTITIES / 16.0f  );
-	int threadsD = ceilf( NUMENTITIES / (float)blocksD )
+	int threadsD = ceilf( NUMENTITIES / (float)blocksD );
 	dim3 gridDim(blocksD, blocksD, 1);
 	dim3 blockDim(threadsD, threadsD, 1);
 	//dim3 bDim(16,16);                            // threads in block
@@ -72,7 +72,7 @@ void compute(){
 
 	// allocate gpu variables
 	cudaMalloc((void**) &dev_hPos, sizeof(vector3) * NUMENTITIES);
-	cudaMalloc((void**) &dev_hvel, sizeof(vector3) * NUMENTITIES);
+	cudaMalloc((void**) &dev_hVel, sizeof(vector3) * NUMENTITIES);
 	cudaMalloc((void**) &dev_acc, sizeof(vector3) * NUMENTITIES);
 	cudaMalloc((void**) &dev_sum, sizeof(vector3) * NUMENTITIES);
 	cudaMalloc((void**) &dev_mass, sizeof(double) * NUMENTITIES);
@@ -88,7 +88,7 @@ void compute(){
 
 	// sum matrices and update values
 	pSum<<<gridDim.x, blockDim.x>>>(dev_acc, dev_sum, dev_hPos, dev_hVel);
-	cudeDeviceSynchronize();
+	cudaDeviceSynchronize();
 
 	// copy gpu results back to host
 	cudaMemcpy(hPos, dev_hPos, sizeof(vector3)*NUMENTITIES, cudaMemcpyDeviceToHost);
